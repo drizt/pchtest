@@ -75,7 +75,7 @@ function(pch_link_target target)
             set(${langid}_depends "${gch_path}")
 
             set_source_files_properties(${src_path} PROPERTIES
-                COMPILE_OPTIONS "-x;${lang_flag}"
+                COMPILE_FLAGS "-x;${lang_flag}"
                 OBJECT_DEPENDS ${dummy_obj_path}
             )
 
@@ -96,7 +96,7 @@ function(pch_link_target target)
         if(langid AND NOT pch_generated AND ${langid}_depends)
             set_source_files_properties(${s} PROPERTIES
                 OBJECT_DEPENDS "${${langid}_depends}"
-                COMPILE_OPTIONS "${${langid}_include}"
+                COMPILE_FLAGS "${${langid}_include}"
             )
         endif()
 endforeach()
