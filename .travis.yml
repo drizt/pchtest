@@ -24,3 +24,4 @@ script:
             -DCMAKE_PREFIX_PATH=$(brew --prefix qt5)
       cmake --build .
     fi
+ 
