@@ -1,1 +1,3 @@
-#include <stdio.h>
+#include <QApplication>
+#include <QDebug>
+#include <QDialog>

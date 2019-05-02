@@ -32,12 +32,19 @@ function(pch_wrap res pch_header)
 
     set(pch_list "${pch_header};${base_name}.${source_ext};${base_name}_dummy.${source_ext}")
     set_source_files_properties(${pch_header} PROPERTIES PCH_LANGID ${langid})
-    set_source_files_properties(${pch_list} PROPERTIES PCH_GENERATED TRUE)
+    set_source_files_properties(${pch_list} PROPERTIES
+        PCH_GENERATED TRUE
+        SKIP_AUTOMOC TRUE
+    )
     set_source_files_properties(${base_name}.${source_ext};${base_name}_dummy.${source_ext} PROPERTIES GENERATED TRUE)
     set("${res}" ${pch_list} PARENT_SCOPE)
 endfunction()
 
 function(pch_link_target target)
+    # Force to check correct pch header
+    target_compile_options(${target} PUBLIC "-Winvalid-pch")
+
+
     get_target_property(sources ${target} SOURCES)
 
     set(files_dir "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}")
@@ -67,12 +74,6 @@ function(pch_link_target target)
             set(${langid}_include "-include;${pch_path}")
             set(${langid}_depends "${gch_path}")
 
-            message(STATUS "include ${langid}_include ${${langid}_include}")
-            message(STATUS "depends ${langid}_depends ${${langid}_depends}")
-
-            message(STATUS "src_path ${src_path}")
-            message(STATUS "dummy_obj_path" ${dummy_obj_path})
-
             set_source_files_properties(${src_path} PROPERTIES
                 COMPILE_OPTIONS "-x;${lang_flag}"
                 OBJECT_DEPENDS ${dummy_obj_path}
@@ -88,7 +89,6 @@ function(pch_link_target target)
         endif()
     endforeach()
 
-    message(STATUS "${sources}")
     foreach(s ${sources})
         get_source_file_property(langid ${s} LANGUAGE)
         get_source_file_property(pch_generated ${s} PCH_GENERATED)
@@ -108,10 +108,12 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 pch_wrap(PCH_SOURCES pch.h)
 
-message(STATUS "pch sources ${PCH_SOURCES}")
+find_package(Qt5Widgets REQUIRED)
+set(CMAKE_AUTOMOC ON)
 
 add_executable(${PROJECT_NAME} "main.cpp" ${PCH_SOURCES})
-add_compile_options(${PROJECT_NAME} PUBLIC -Wall -Werror -Winvalid-pch)
+add_compile_options(${PROJECT_NAME} PUBLIC -Wall -Werror)
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
 
 pch_link_target(${PROJECT_NAME})
 

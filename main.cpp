@@ -1,6 +1,11 @@
+
 int main(int argc, char *argv[])
 {
-    printf("hello world\n");
+    QApplication a(argc, argv);
 
-    return 0;
+    QDialog dlg;
+    dlg.show();
+    dlg.setWindowTitle("Hello world!");
+
+    return a.exec();
 }
