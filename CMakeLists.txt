@@ -71,13 +71,22 @@ function(pch_link_target target)
             set(dummy_path "${files_dir}/pch_gen.dir/${base_name}_dummy.${source_ext}") # /../CMakeFiles/pch_gen/pch_dummy.cpp
             set(dummy_obj_path "${support_dir}/${base_name}_dummy.${source_ext}.o") # /../CMakeFiles/pchtest.dir/pch_dummy.cpp.o
 
-            set(${langid}_include "-include;${pch_path}")
             set(${langid}_depends "${gch_path}")
 
-            set_source_files_properties(${src_path} PROPERTIES
-                COMPILE_FLAGS "-x;${lang_flag}"
-                OBJECT_DEPENDS ${dummy_obj_path}
-            )
+
+            if(${CMAKE_VERSION} VERSION_LESS "3.10.0")
+                set(${langid}_include "-include ${pch_path}")
+                set_source_files_properties(${src_path} PROPERTIES
+                    COMPILE_FLAGS "-x ${lang_flag}"
+                    OBJECT_DEPENDS ${dummy_obj_path}
+                )
+            else()
+                set(${langid}_include "-include;${pch_path}")
+                set_source_files_properties(${src_path} PROPERTIES
+                    COMPILE_OPTIONS "-x;${lang_flag}"
+                    OBJECT_DEPENDS ${dummy_obj_path}
+                )
+            endif()
 
             add_custom_command(OUTPUT "${gch_path}"
                 COMMAND ${CMAKE_COMMAND} -E rename "${obj_path}" "${gch_path}"
@@ -94,10 +103,18 @@ function(pch_link_target target)
         get_source_file_property(pch_generated ${s} PCH_GENERATED)
 
         if(langid AND NOT pch_generated AND ${langid}_depends)
-            set_source_files_properties(${s} PROPERTIES
-                OBJECT_DEPENDS "${${langid}_depends}"
-                COMPILE_FLAGS "${${langid}_include}"
-            )
+
+            if(${CMAKE_VERSION} VERSION_LESS "3.10.0")
+                set_source_files_properties(${s} PROPERTIES
+                    OBJECT_DEPENDS "${${langid}_depends}"
+                    COMPILE_FLAGS "${${langid}_include}"
+                )
+            else()
+                set_source_files_properties(${s} PROPERTIES
+                    OBJECT_DEPENDS "${${langid}_depends}"
+                    COMPILE_OPTIONS "${${langid}_include}"
+                )
+            endif()
         endif()
 endforeach()
 endfunction()
