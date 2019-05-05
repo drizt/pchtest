@@ -6,11 +6,11 @@ language: cpp
 
 matrix:
   include:
-    - {name: "Ubuntu 14.04 Make",  os: "linux", dist: "trusty",  compiler: "gcc", addons: {apt: {packages: "qtbase5-dev"}}, env: "GENERATOR=Unix Makefiles"}
+    - {name: "Ubuntu 14.04 Make",  os: "linux", dist: "trusty",  compiler: "gcc", addons: {apt: {packages: "qtbase5-dev"}}, env: "GENERATOR=\"Unix Makefiles\""}
     - {name: "Ubuntu 14.04 Ninja", os: "linux", dist: "trusty",  compiler: "gcc", addons: {apt: {packages: "qtbase5-dev ninja"}}, env: "GENERATOR=Ninja"}
-    - {name: "Ubuntu 16.04 Make",  os: "linux", dist: "xenial",  compiler: "gcc", addons: {apt: {packages: "qtbase5-dev"}}, env: "GENERATOR=Unix Makefiles"}
+    - {name: "Ubuntu 16.04 Make",  os: "linux", dist: "xenial",  compiler: "gcc", addons: {apt: {packages: "qtbase5-dev"}}, env: "GENERATOR=\"Unix Makefiles\""}
     - {name: "Ubuntu 16.04 Ninja", os: "linux", dist: "xenial",  compiler: "gcc", addons: {apt: {packages: "qtbase5-dev ninja"}}, env: "GENERATOR=Ninja"}
-    - {name: "macOS Make",  os: "osx", addons: {homebrew: {packages: "qt5"}}, env: "GENERATOR=Unix Makefiles"}
+    - {name: "macOS Make",  os: "osx", addons: {homebrew: {packages: "qt5"}}, env: "GENERATOR=\"Unix Makefiles\""}
     - {name: "macOS Ninja", os: "osx", addons: {homebrew: {packages: ["qt5", "ninja"]}}, env: "GENERATOR=Ninja"}
 
 script:
