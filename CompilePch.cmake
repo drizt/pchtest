@@ -57,11 +57,15 @@ else()
     message(FATAL_ERROR "${LANG} language is not supported.")
 endif()
 
+# Path to PCH header can be absolue or relative
+if(NOT IS_ABSOLUTE ${SOURCE_FILE})
+    set(SOURCE_FILE ${SOURCE_DIR}/${SOURCE_FILE})
+endif()
+
 # Search given SOURCE_FILE in compile_commands.json
 set(I 0)
 while(COMMANDS_${I}.command)
-
-    if(COMMANDS_${I}.file STREQUAL ${SOURCE_DIR}/${SOURCE_FILE})
+    if(COMMANDS_${I}.file STREQUAL ${SOURCE_FILE})
         separate_arguments(ARGS NATIVE_COMMAND ${COMMANDS_${I}.command})
         list(FIND ARGS "-o" POS)
         if(POS STREQUAL -1)

@@ -1,3 +1,5 @@
+set(_current_list_dir ${CMAKE_CURRENT_LIST_DIR})
+
 function(pch_link_target target pch_header)
     # Force to check correct pch header
     target_compile_options(${target} PUBLIC "-Winvalid-pch")
@@ -61,6 +63,8 @@ function(pch_link_target target pch_header)
         endforeach()
     endif()
 
+    message(STATUS "Current list file: ${_current_list_dir}")
+
     add_custom_target(${target}_pch
         ${CMAKE_COMMAND} -DSOURCE_FILE=${compile_source}
                          -DTARGET=${target}
@@ -68,7 +72,7 @@ function(pch_link_target target pch_header)
                          -DBINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}
                          -DPCH=${pch_header}
                          -DLANG=${pchlangid}
-                         -P ${CMAKE_CURRENT_LIST_DIR}/CompilePch.cmake
+                         -P ${_current_list_dir}/CompilePch.cmake
         BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${target}_pch.dir/${pch_header}.gch
     )
     add_dependencies(${target} ${target}_pch)
