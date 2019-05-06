@@ -37,11 +37,10 @@ function(pch_link_target target pch_header)
         endif()
     endforeach()
 
-    if(NOT has_objc)
+    if(has_objc)
         foreach(s ${sources})
             get_source_file_property(langid ${s} LANGUAGE)
-
-            if (langid AND (pchlangid STREQUAL langid) AND (NOT s MATCHES ${RX}))
+            if (langid AND (pchlangid STREQUAL langid) AND (NOT ${s} MATCHES ${RX}))
                 set(compile_source ${s})
                 if(${CMAKE_VERSION} VERSION_LESS "3.10.0")
                     set_source_files_properties(${s} PROPERTIES COMPILE_FLAGS "-include ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${target}_pch.dir/${pch_header}")
