@@ -23,7 +23,7 @@ function(pch_link_target target pch_header)
     get_target_property(sources ${target} SOURCES)
 
     # Check for Objective-C/Objective-C++ files
-    if(langid STREQUAL CXX)
+    if(pchlangid STREQUAL CXX)
         set(RX "\\.mm$")
     else()
         set(RX "\\.m$")
