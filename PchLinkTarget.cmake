@@ -37,13 +37,9 @@ function(pch_link_target target pch_header)
         endif()
     endforeach()
 
-    if(has_objc)
+    if(NOT has_objc)
         foreach(s ${sources})
             get_source_file_property(langid ${s} LANGUAGE)
-
-            if(s MATCHES ${RX})
-                set(has_objc TRUE)
-            endif()
 
             if (langid AND (pchlangid STREQUAL langid) AND (NOT s MATCHES ${RX}))
                 set(compile_source ${s})
