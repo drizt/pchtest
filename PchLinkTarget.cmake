@@ -35,20 +35,35 @@ function(pch_link_target target pch_header)
         if(s MATCHES ${RX})
             set(has_objc TRUE)
         endif()
-
-        if (langid AND (pchlangid STREQUAL langid) AND (NOT s MATCHES ${RX}))
-            set(compile_source ${s})
-            if(${CMAKE_VERSION} VERSION_LESS "3.10.0")
-                set_source_files_properties(${s} PROPERTIES COMPILE_FLAGS "-include ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${target}_pch.dir/${pch_header}")
-            else()
-                set_source_files_properties(${s} PROPERTIES COMPILE_OPTIONS "-include;${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${target}_pch.dir/${pch_header}")
-            endif()
-        endif()
     endforeach()
 
-    # Propogate PCH header to automoc sources
-    if(NOT has_objc)
-        target_compile_options(${target} PRIVATE "$<$<COMPILE_LANGUAGE:${lang}>:-include;${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${target}_pch.dir/${pch_header}>")
+    if(has_objc)
+        foreach(s ${sources})
+            get_source_file_property(langid ${s} LANGUAGE)
+
+            if(s MATCHES ${RX})
+                set(has_objc TRUE)
+            endif()
+
+            if (langid AND (pchlangid STREQUAL langid) AND (NOT s MATCHES ${RX}))
+                set(compile_source ${s})
+                if(${CMAKE_VERSION} VERSION_LESS "3.10.0")
+                    set_source_files_properties(${s} PROPERTIES COMPILE_FLAGS "-include ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${target}_pch.dir/${pch_header}")
+                else()
+                    set_source_files_properties(${s} PROPERTIES COMPILE_OPTIONS "-include;${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${target}_pch.dir/${pch_header}")
+                endif()
+            endif()
+        endforeach()
+    else()
+        # Propogate PCH header to automoc sources
+        target_compile_options(${target} PRIVATE "$<$<COMPILE_LANGUAGE:${pchlangid}>:-include;${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${target}_pch.dir/${pch_header}>")
+        foreach(s ${sources})
+            get_source_file_property(langid ${s} LANGUAGE)
+
+            if (langid AND (pchlangid STREQUAL langid) AND (NOT s MATCHES ${RX}))
+                set(compile_source ${s})
+            endif()
+        endforeach()
     endif()
 
     add_custom_target(${target}_pch
@@ -59,6 +74,7 @@ function(pch_link_target target pch_header)
                          -DPCH=${pch_header}
                          -DLANG=${pchlangid}
                          -P ${CMAKE_CURRENT_LIST_DIR}/CompilePch.cmake
+        BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${target}_pch.dir/${pch_header}.gch
     )
     add_dependencies(${target} ${target}_pch)
 endfunction()

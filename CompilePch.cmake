@@ -60,7 +60,6 @@ endif()
 # Search given SOURCE_FILE in compile_commands.json
 set(I 0)
 while(COMMANDS_${I}.command)
-    message(STATUS "${COMMANDS_${I}.file}")
 
     if(COMMANDS_${I}.file STREQUAL ${SOURCE_DIR}/${SOURCE_FILE})
         separate_arguments(ARGS NATIVE_COMMAND ${COMMANDS_${I}.command})
@@ -86,9 +85,13 @@ while(COMMANDS_${I}.command)
         message(STATUS "Recompile ${PCH} PCH header")
         execute_process(COMMAND ${ARGS} WORKING_DIRECTORY ${BINARY_DIR})
         set(WORKING_DIR ${COMMANDS_${I}.directory})
+        set(FOUND_SOURCE TRUE)
+        break()
     endif()
 
     math(EXPR I "${I} + 1")
 endwhile()
 
-
+if(NOT FOUND_SOURCE)
+    message(FATAL_ERROR "Source file isn't found in compile_commands.json")
+endif()
