@@ -63,8 +63,6 @@ if(NOT EXISTS ${COMPILE_COMMANDS_PATH})
     message(FATAL_ERROR "${COMPILE_COMMANDS_PATH} is not exists. Probably CMAKE_EXPORT_COMPILE_COMMANDS is not set.")
 endif()
 
-execute_process(COMMAND date WORKING_DIRECTORY ${CURRENT_BINARY_DIR})
-
 # Read and parse compile_commands.json
 file(READ ${COMPILE_COMMANDS_PATH} COMPILE_COMMANDS_TEXT)
 
