@@ -8,7 +8,13 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package(Qt5Widgets REQUIRED)
 set(CMAKE_AUTOMOC ON)
 
-add_executable(${PROJECT_NAME} "main.cpp" "dialog.h" "dialog.cpp" ${PCH_SOURCES})
+set(SOURCES main.cpp dialog.h dialog.cpp pch.h)
+
+if(APPLE)
+    list(APPEND SOURCES func.mm)
+endif()
+
+add_executable(${PROJECT_NAME} ${SOURCES})
 add_compile_options(${PROJECT_NAME} PUBLIC -Wall -Werror)
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
 
