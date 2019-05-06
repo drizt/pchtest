@@ -37,7 +37,7 @@ function(pch_link_target target pch_header)
     endif()
 
     foreach(s ${sources})
-        if(s MATCHES "^\\\$\<")
+        if(s MATCHES "^\\\$<")
             continue()
         endif()
 
@@ -50,7 +50,7 @@ function(pch_link_target target pch_header)
 
     if(has_objc)
         foreach(s ${sources})
-            if(s MATCHES "^\\\$\<")
+            if(s MATCHES "^\\\$<")
                 continue()
             endif()
 
@@ -68,7 +68,7 @@ function(pch_link_target target pch_header)
         # Propogate PCH header to automoc sources
         target_compile_options(${target} PRIVATE "$<$<COMPILE_LANGUAGE:${pchlangid}>:-include;${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${target}_pch.dir/${pch_header}>")
         foreach(s ${sources})
-            if(s MATCHES "^\\\$\<")
+            if(s MATCHES "^\\\$<")
                 continue()
             endif()
 
