@@ -21,9 +21,22 @@ function(pch_link_target target pch_header)
     set(compile_source "")
     set(gch_path ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${target}_pch.dir/${pch_header}.gch)
     get_target_property(sources ${target} SOURCES)
+
+    # Check for Objective-C/Objective-C++ files
+    if(langid STREQUAL CXX)
+        set(RX "\\.mm$")
+    else()
+        set(RX "\\.m$")
+    endif()
+
     foreach(s ${sources})
         get_source_file_property(langid ${s} LANGUAGE)
-        if (langid AND (pchlangid STREQUAL langid))
+
+        if(s MATCHES ${RX})
+            set(has_objc TRUE)
+        endif()
+
+        if (langid AND (pchlangid STREQUAL langid) AND (NOT s MATCHES ${RX}))
             set(compile_source ${s})
             if(${CMAKE_VERSION} VERSION_LESS "3.10.0")
                 set_source_files_properties(${s} PROPERTIES COMPILE_FLAGS "-include ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${target}_pch.dir/${pch_header}")
@@ -33,12 +46,18 @@ function(pch_link_target target pch_header)
         endif()
     endforeach()
 
+    # Propogate PCH header to automoc sources
+    if(NOT has_objc)
+        target_compile_options(${target} PRIVATE "$<$<COMPILE_LANGUAGE:${lang}>:-include;${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${target}_pch.dir/${pch_header}>")
+    endif()
+
     add_custom_target(${target}_pch
         ${CMAKE_COMMAND} -DSOURCE_FILE=${compile_source}
                          -DTARGET=${target}
                          -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
                          -DBINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}
                          -DPCH=${pch_header}
+                         -DLANG=${pchlangid}
                          -P ${CMAKE_CURRENT_LIST_DIR}/CompilePch.cmake
     )
     add_dependencies(${target} ${target}_pch)
