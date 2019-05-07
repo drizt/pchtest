@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(pchtest C CXX)
+project(pchtest CXX)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

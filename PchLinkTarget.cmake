@@ -1,10 +1,5 @@
 set(_current_list_dir ${CMAKE_CURRENT_LIST_DIR})
 
-# Compile parse-compile-commands
-if(NOT EXISTS ${CMAKE_BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX})
-    execute_process(COMMAND ${CMAKE_C_COMPILER} ${_current_list_dir}/parse-compile-commands.c -o ${CMAKE_BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX})
-endif()
-
 function(pch_link_target target pch_header)
     # Force to check correct pch header
     target_compile_options(${target} PUBLIC "-Winvalid-pch")

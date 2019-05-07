@@ -45,6 +45,17 @@ foreach(VAR SOURCE_DIR;BINARY_DIR;TARGET;PCH;SOURCE_FILE;LANG;CURRENT_BINARY_DIR
     endif()
 endforeach()
 
+# Compile parse-compile-commands
+if(NOT EXISTS ${BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX})
+    include(CheckLanguage)
+    # check_language requires CMAKE_GENERATOR
+    if(NOT CMAKE_GENERATOR)
+        set(CMAKE_GENERATOR "Unix Makefiles")
+    endif()
+    check_language(C)
+    execute_process(COMMAND ${CMAKE_C_COMPILER} ${CMAKE_CURRENT_LIST_DIR}/parse-compile-commands.c -o ${BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX})
+endif()
+
 # Path to PCH header can be absolue or relative
 if(IS_ABSOLUTE ${PCH})
     set(PCH_PATH ${PCH})
