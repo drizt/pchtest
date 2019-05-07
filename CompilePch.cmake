@@ -55,7 +55,7 @@ while(EXISTS ${BINARY_DIR}/parse-compile-commands.guard)
     execute_process(COMMAND ${CMAKE_COMMAND} -E sleep 1)
 endwhile()
 
-file(TOUCH ${BINARY_DIR}/parse-compile-commands.guard)
+execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${BINARY_DIR}/parse-compile-commands.guard)
 
 # Compile parse-compile-commands
 if(NOT EXISTS ${BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX})
