@@ -83,12 +83,14 @@ endif()
 
 # Check PCH header exists
 if(NOT EXISTS ${PCH_PATH})
+    file(REMOVE ${BINARY_DIR}/parse-compile-commands.guard)
     message(FATAL_ERROR "${PCH_PATH} is not exists.")
 endif()
 
 # Check compile_commands.json exists
 set(COMPILE_COMMANDS_PATH ${BINARY_DIR}/compile_commands.json)
 if(NOT EXISTS ${COMPILE_COMMANDS_PATH})
+    file(REMOVE ${BINARY_DIR}/parse-compile-commands.guard)
     message(FATAL_ERROR "${COMPILE_COMMANDS_PATH} is not exists. Probably CMAKE_EXPORT_COMPILE_COMMANDS is not set.")
 endif()
 
@@ -109,6 +111,7 @@ if(LANG STREQUAL CXX)
 elseif(LANG STREQUAL C)
     set(LANG_HEADER c-header)
 else()
+    file(REMOVE ${BINARY_DIR}/parse-compile-commands.guard)
     message(FATAL_ERROR "${LANG} language is not supported.")
 endif()
 
@@ -129,6 +132,7 @@ execute_process(
 )
 
 if (NOT ARGS)
+    file(REMOVE ${BINARY_DIR}/parse-compile-commands.guard)
     message(FATAL_ERROR "Can't parse compile command for ${SOURCE_FILE}: ${RESULT}")
 endif()
 

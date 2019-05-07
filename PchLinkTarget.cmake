@@ -1,5 +1,8 @@
 set(_current_list_dir ${CMAKE_CURRENT_LIST_DIR})
 
+# Remove guard file
+file(REMOVE ${CMAKE_BINARY_DIR}/parse-compile-commands.guard)
+
 function(pch_link_target target pch_header)
     # Force to check correct pch header
     target_compile_options(${target} PUBLIC "-Winvalid-pch")
