@@ -50,7 +50,13 @@ if(NOT EXISTS ${BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX})
     include(CheckLanguage)
     # check_language requires CMAKE_GENERATOR
     if(NOT CMAKE_GENERATOR)
-        set(CMAKE_GENERATOR "Unix Makefiles")
+        if(UNIX)
+            set(CMAKE_GENERATOR "Unix Makefiles")
+        elseif("$ENV{MSYSTEM}" STREQUAL MSYS)
+            set(CMAKE_GENERATOR "MSYS Makefiles")
+        else()
+            set(CMAKE_GENERATOR "MinGW Makefiles")
+        endif()
     endif()
     check_language(C)
     execute_process(COMMAND ${CMAKE_C_COMPILER} ${CMAKE_CURRENT_LIST_DIR}/parse-compile-commands.c -o ${BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX})
@@ -99,9 +105,20 @@ if(NOT IS_ABSOLUTE ${SOURCE_FILE})
     set(SOURCE_FILE ${SOURCE_DIR}/${SOURCE_FILE})
 endif()
 
+# Fix source file path
+if("$ENV{MSYSTEM}" STREQUAL MSYS)
+    string(REGEX REPLACE "^/([A-Z])/" "\\1:/" SOURCE_FILE ${SOURCE_FILE})
+    message(STATUS "new source ${SOURCE_FILE}")
+endif()
+
 execute_process(
     COMMAND ${BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX} ${COMPILE_COMMANDS_PATH} ${SOURCE_FILE}
     OUTPUT_VARIABLE ARGS
 )
+
+# Fix args
+if("$ENV{MSYSTEM}" STREQUAL MSYS)
+    string(REGEX REPLACE "^/([A-Z])/" "\\1:/" ARGS "${ARGS}")
+endif()
 
 compile_pch(${ARGS} ${PCH_PATH} ${GSH_PATH} ${LANG_HEADER} ${CURRENT_BINARY_DIR})
