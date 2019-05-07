@@ -45,35 +45,6 @@ foreach(VAR SOURCE_DIR;BINARY_DIR;TARGET;PCH;SOURCE_FILE;LANG;CURRENT_BINARY_DIR
     endif()
 endforeach()
 
-# CMAKE_EXECUTABLE_SUFFIX is not defined in scripting mode
-if(WIN32)
-    set(CMAKE_EXECUTABLE_SUFFIX .exe)
-endif()
-
-# Guard
-while(EXISTS ${BINARY_DIR}/parse-compile-commands.guard)
-    execute_process(COMMAND ${CMAKE_COMMAND} -E sleep 1)
-endwhile()
-
-execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${BINARY_DIR}/parse-compile-commands.guard)
-
-# Compile parse-compile-commands
-if(NOT EXISTS ${BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX})
-    include(CheckLanguage)
-    # check_language requires CMAKE_GENERATOR
-    if(NOT CMAKE_GENERATOR)
-        if(UNIX)
-            set(CMAKE_GENERATOR "Unix Makefiles")
-        elseif("$ENV{MSYSTEM}" STREQUAL MSYS)
-            set(CMAKE_GENERATOR "MSYS Makefiles")
-        else()
-            set(CMAKE_GENERATOR "MinGW Makefiles")
-        endif()
-    endif()
-    check_language(C)
-    execute_process(COMMAND ${CMAKE_C_COMPILER} ${CMAKE_CURRENT_LIST_DIR}/parse-compile-commands.c -o ${BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX})
-endif()
-
 # Path to PCH header can be absolue or relative
 if(IS_ABSOLUTE ${PCH})
     set(PCH_PATH ${PCH})
@@ -83,14 +54,12 @@ endif()
 
 # Check PCH header exists
 if(NOT EXISTS ${PCH_PATH})
-    file(REMOVE ${BINARY_DIR}/parse-compile-commands.guard)
     message(FATAL_ERROR "${PCH_PATH} is not exists.")
 endif()
 
 # Check compile_commands.json exists
 set(COMPILE_COMMANDS_PATH ${BINARY_DIR}/compile_commands.json)
 if(NOT EXISTS ${COMPILE_COMMANDS_PATH})
-    file(REMOVE ${BINARY_DIR}/parse-compile-commands.guard)
     message(FATAL_ERROR "${COMPILE_COMMANDS_PATH} is not exists. Probably CMAKE_EXPORT_COMPILE_COMMANDS is not set.")
 endif()
 
@@ -111,7 +80,6 @@ if(LANG STREQUAL CXX)
 elseif(LANG STREQUAL C)
     set(LANG_HEADER c-header)
 else()
-    file(REMOVE ${BINARY_DIR}/parse-compile-commands.guard)
     message(FATAL_ERROR "${LANG} language is not supported.")
 endif()
 
@@ -132,7 +100,6 @@ execute_process(
 )
 
 if (NOT ARGS)
-    file(REMOVE ${BINARY_DIR}/parse-compile-commands.guard)
     message(FATAL_ERROR "Can't parse compile command for ${SOURCE_FILE}: ${RESULT}")
 endif()
 
@@ -142,5 +109,3 @@ if("$ENV{MSYSTEM}" STREQUAL MSYS)
 endif()
 
 compile_pch(${ARGS} ${PCH_PATH} ${GSH_PATH} ${LANG_HEADER} ${CURRENT_BINARY_DIR})
-
-file(REMOVE ${BINARY_DIR}/parse-compile-commands.guard)

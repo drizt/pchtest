@@ -1,8 +1,5 @@
 set(_current_list_dir ${CMAKE_CURRENT_LIST_DIR})
 
-# Remove guard file
-file(REMOVE ${CMAKE_BINARY_DIR}/parse-compile-commands.guard)
-
 function(pch_link_target target pch_header)
     # Force to check correct pch header
     target_compile_options(${target} PUBLIC "-Winvalid-pch")
@@ -90,4 +87,13 @@ function(pch_link_target target pch_header)
         BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${target}_pch.dir/${pch_header}.gch
     )
     add_dependencies(${target} ${target}_pch)
+
+    if(NOT TARGET parse-compile-commands)
+        add_custom_target(parse-compile-commands
+            ${CMAKE_COMMAND} -DBINARY_DIR=${CMAKE_BINARY_DIR}
+                             -P ${_current_list_dir}/CompileParseCommand.cmake
+            BYPRODUCTS ${CMAKE_BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX}
+        )
+    endif()
+    add_dependencies(${target}_pch parse-compile-commands)
 endfunction()
