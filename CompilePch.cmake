@@ -50,6 +50,13 @@ if(WIN32)
     set(CMAKE_EXECUTABLE_SUFFIX .exe)
 endif()
 
+# Guard
+while(EXISTS ${BINARY_DIR}/parse-compile-commands.guard)
+    execute_process(COMMAND ${CMAKE_COMMAND} -E sleep 1)
+endwhile()
+
+file(TOUCH ${BINARY_DIR}/parse-compile-commands.guard)
+
 # Compile parse-compile-commands
 if(NOT EXISTS ${BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX})
     include(CheckLanguage)
@@ -113,13 +120,17 @@ endif()
 # Fix source file path
 if("$ENV{MSYSTEM}" STREQUAL MSYS)
     string(REGEX REPLACE "^/([A-Z])/" "\\1:/" SOURCE_FILE ${SOURCE_FILE})
-    message(STATUS "new source ${SOURCE_FILE}")
 endif()
 
 execute_process(
     COMMAND ${BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX} ${COMPILE_COMMANDS_PATH} ${SOURCE_FILE}
     OUTPUT_VARIABLE ARGS
+    RESULT_VARIABLE RESULT
 )
+
+if (NOT ARGS)
+    message(FATAL_ERROR "Can't parse compile command for ${SOURCE_FILE}: ${RESULT}")
+endif()
 
 # Fix args
 if("$ENV{MSYSTEM}" STREQUAL MSYS)
@@ -127,3 +138,5 @@ if("$ENV{MSYSTEM}" STREQUAL MSYS)
 endif()
 
 compile_pch(${ARGS} ${PCH_PATH} ${GSH_PATH} ${LANG_HEADER} ${CURRENT_BINARY_DIR})
+
+file(REMOVE ${BINARY_DIR}/parse-compile-commands.guard)
