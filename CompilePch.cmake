@@ -45,6 +45,11 @@ foreach(VAR SOURCE_DIR;BINARY_DIR;TARGET;PCH;SOURCE_FILE;LANG;CURRENT_BINARY_DIR
     endif()
 endforeach()
 
+# CMAKE_EXECUTABLE_SUFFIX is not defined in scripting mode
+if(WIN32)
+    set(CMAKE_EXECUTABLE_SUFFIX .exe)
+endif()
+
 # Compile parse-compile-commands
 if(NOT EXISTS ${BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX})
     include(CheckLanguage)
