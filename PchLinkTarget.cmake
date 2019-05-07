@@ -88,12 +88,12 @@ function(pch_link_target target pch_header)
     )
     add_dependencies(${target} ${target}_pch)
 
-    if(NOT TARGET parse-compile-commands)
-        add_custom_target(parse-compile-commands
+    if(NOT TARGET compile-parse-compile-commands)
+        add_custom_target(compile-parse-compile-commands
             ${CMAKE_COMMAND} -DBINARY_DIR=${CMAKE_BINARY_DIR}
                              -P ${_current_list_dir}/CompileParseCommand.cmake
             BYPRODUCTS ${CMAKE_BINARY_DIR}/parse-compile-commands${CMAKE_EXECUTABLE_SUFFIX}
         )
     endif()
-    add_dependencies(${target}_pch parse-compile-commands)
+    add_dependencies(${target}_pch compile-parse-compile-commands)
 endfunction()
